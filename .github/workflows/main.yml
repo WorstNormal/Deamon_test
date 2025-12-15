@@ -1,41 +1,38 @@
-name: Deploy via Public API
+name: Deploy with SSH Tunnel
 
-on:
-  pull_request_target:
-    types: [labeled]
+on: [push]
 
 jobs:
-  deploy-via-api:
-    if: contains(github.event.pull_request.labels.*.name, 'deploy')
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Скачиваем содержимое репозитория (оно попадает в текущую папку)
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      # 1. Устанавливаем SSH-агент и добавляем ключ
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
         with:
-          python-version: '3.10'
+            ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Install dependencies
+      # 2. Поднимаем туннель
+      # Команда пробрасывает порт 5432 удаленного сервера на порт 5432 внутри раннера GitHub
+      - name: Create SSH Tunnel
         run: |
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          # Убедитесь, что устанавливаются все нужные библиотеки для клиента
-          pip install requests pydantic pyyaml
+          ssh -o StrictHostKeyChecking=no -f -N -L 5432:127.0.0.1:5432 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+          echo "Tunnel established on port 5432"
 
-      # 2. Запускаем runner.py
-      # Теперь мы передаем точку "." (текущая директория), так как checkout распаковал курс прямо сюда.
-      # PYTHONPATH=. нужен, чтобы питон видел пакет src как модуль.
-      - name: Upload Course
+      # 3. Теперь можно запускать ваши скрипты
+      # Они будут думать, что база находится локально на 127.0.0.1:5432
+      - name: Run Database Scripts
         env:
-          LMS_API_URL: ${{ secrets.LMS_API_URL }}
-          LMS_API_TOKEN: ${{ secrets.LMS_API_TOKEN }}
-          # Указываем Python, где искать пакет src
-          PYTHONPATH: .
+          # Обратите внимание: хост теперь localhost (из секрета DB_HOST)
+          PGHOST: ${{ secrets.DB_HOST }}
+          PGPORT: ${{ secrets.DB_PORT }}
+          PGUSER: ${{ secrets.DB_USER }}
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          echo "🚀 Sending to Public API: $LMS_API_URL"
-          # Запускаем runner как модуль и передаем ему путь к папке 'example'
-          python -m src.runner Example
+           # Пример проверки подключения
+           psql -c "SELECT version();"
+           
+           # Или запуск вашего Python скрипта
+           # python runner.py ...
