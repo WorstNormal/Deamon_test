@@ -1,38 +1,46 @@
-name: Deploy with SSH Tunnel
+name: Deploy PR (Label Triggered)
 
-on: [push]
+# 1. Срабатывает, когда на PR вешают метку
+on:
+  pull_request_target:
+    types: [labeled]
 
 jobs:
-  build-and-deploy:
+  deploy-pr:
+    # 2. ЗАЩИТА: Запускать только если метка называется 'deploy'
+    if: contains(github.event.pull_request.labels.*.name, 'deploy')
     runs-on: ubuntu-latest
+    
     steps:
+      # 3. Скачиваем код именно из PR (а не из main)
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
-      # 1. Устанавливаем SSH-агент и добавляем ключ
-      - name: Setup SSH
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install requests pydantic pyyaml
+
+      # 4. Настраиваем SSH (секреты доступны благодаря pull_request_target)
+      - name: Setup SSH Tunnel
         uses: webfactory/ssh-agent@v0.8.0
         with:
-            ssh-private-key: ${{ secrets.SSH_KEY }}
+          ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      # 2. Поднимаем туннель
-      # Команда пробрасывает порт 5432 удаленного сервера на порт 5432 внутри раннера GitHub
-      - name: Create SSH Tunnel
+      - name: Create Tunnel
         run: |
-          ssh -o StrictHostKeyChecking=no -f -N -L 5432:127.0.0.1:5432 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
-          echo "Tunnel established on port 5432"
+          ssh -o StrictHostKeyChecking=no -f -N -L 8000:127.0.0.1:8000 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+          echo "Tunnel opened to 8000"
 
-      # 3. Теперь можно запускать ваши скрипты
-      # Они будут думать, что база находится локально на 127.0.0.1:5432
-      - name: Run Database Scripts
+      # 5. Загружаем курс
+      - name: Upload Course
         env:
-          # Обратите внимание: хост теперь localhost (из секрета DB_HOST)
-          PGHOST: ${{ secrets.DB_HOST }}
-          PGPORT: ${{ secrets.DB_PORT }}
-          PGUSER: ${{ secrets.DB_USER }}
-          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+          LMS_API_URL: http://127.0.0.1:8000
+          LMS_API_TOKEN: ${{ secrets.LMS_API_TOKEN }}
         run: |
-           # Пример проверки подключения
-           psql -c "SELECT version();"
-           
-           # Или запуск вашего Python скрипта
-           # python runner.py ...
+          echo "🚀 Deploying PR #${{ github.event.pull_request.number }} from user ${{ github.event.pull_request.user.login }}"
+          python runner.py *.zip
