@@ -3,7 +3,7 @@ name: Deploy Course to Server
 on:
   push:
     branches: ["main"]
-  workflow_dispatch:  # Позволяет запускать кнопку вручную
+  workflow_dispatch:
 
 jobs:
   upload-course:
@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests pydantic pyyaml
 
-      # 1. SSH Туннель к вашему API (порт 8000)
+      # 1. SSH Туннель к API (порт 8000)
       - name: Setup SSH Tunnel
         uses: webfactory/ssh-agent@v0.8.0
         with:
@@ -30,15 +30,12 @@ jobs:
           ssh -o StrictHostKeyChecking=no -f -N -L 8000:127.0.0.1:8000 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
           echo "Tunnel opened to 8000"
 
-      # 2. Запуск загрузки
+      # 2. Запуск загрузки любого ZIP-архива
       - name: Upload Course
         env:
-          # Используем секреты, которые вы настроили
           LMS_API_URL: http://127.0.0.1:8000
           LMS_API_TOKEN: ${{ secrets.LMS_API_TOKEN }}
         run: |
-          # Создаем архив из папки (если нужно) или указываем путь
-          zip -r course.zip IRTEGOV_NEW/ 
-          
-          # Запускаем скрипт
-          python runner.py course.zip
+          # Команда *.zip найдет первый попавшийся zip-файл в папке
+          echo "Found archive: " *.zip
+          python runner.py *.zip
