@@ -1,15 +1,21 @@
-name: Deploy Course to Server
+name: Deploy via Public API
 
+# Запуск по метке (как мы и договаривались)
 on:
-  push:
-    branches: ["main"]
-  workflow_dispatch:
+  pull_request_target:
+    types: [labeled]
 
 jobs:
-  upload-course:
+  deploy-via-api:
+    # Запуск только если стоит метка 'deploy'
+    if: contains(github.event.pull_request.labels.*.name, 'deploy')
     runs-on: ubuntu-latest
+
     steps:
+      # 1. Скачиваем код из PR
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -19,23 +25,13 @@ jobs:
       - name: Install dependencies
         run: pip install requests pydantic pyyaml
 
-      # 1. SSH Туннель к API (порт 8000)
-      - name: Setup SSH Tunnel
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
-
-      - name: Create Tunnel
-        run: |
-          ssh -o StrictHostKeyChecking=no -f -N -L 8000:127.0.0.1:8000 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
-          echo "Tunnel opened to 8000"
-
-      # 2. Запуск загрузки любого ZIP-архива
+      # 2. ПРОСТО ОТПРАВЛЯЕМ ФАЙЛ
+      # Никаких SSH, никаких ключей. Просто стучимся по URL из секрета.
       - name: Upload Course
         env:
-          LMS_API_URL: http://127.0.0.1:8000
+          # Ссылка берется из секретов (куда вы вставили ngrok url)
+          LMS_API_URL: ${{ secrets.LMS_API_URL }}
           LMS_API_TOKEN: ${{ secrets.LMS_API_TOKEN }}
         run: |
-          # Команда *.zip найдет первый попавшийся zip-файл в папке
-          echo "Found archive: " *.zip
+          echo "🚀 Sending to Public API: $LMS_API_URL"
           python runner.py *.zip
