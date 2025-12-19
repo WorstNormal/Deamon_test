@@ -9,7 +9,6 @@ class CourseUploader:
         self.base_url = base_url.rstrip('/')
         self.timeout = timeout
 
-        # Увеличиваем паузу между попытками (backoff_factor=2)
         retry_strategy = Retry(
             total=max_retries,
             backoff_factor=2,
@@ -29,7 +28,6 @@ class CourseUploader:
         })
 
     def upload_course(self, course_data: Dict[str, Any]) -> None:
-        # Путь совпадает с вашим скриншотом Swagger
         endpoint = f"{self.base_url}/api/v1/courses/import"
 
         try:
@@ -43,5 +41,4 @@ class CourseUploader:
             print(f"✅ Course uploaded successfully. Server Status: {response.status_code}")
 
         except Exception as e:
-            # Ловим все ошибки, чтобы увидеть реальную причину в логах GitHub
             raise APIClientError(f"Upload failed: {str(e)}")

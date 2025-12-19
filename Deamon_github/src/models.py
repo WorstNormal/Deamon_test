@@ -43,7 +43,6 @@ class CourseModel(BaseModel):
     course_name: str
     description: Optional[str] = None
     modules: List[ModuleModel]
-
     @field_validator("modules")
     @classmethod
     def modules_non_empty(cls, v: List[ModuleModel]) -> List[ModuleModel]:

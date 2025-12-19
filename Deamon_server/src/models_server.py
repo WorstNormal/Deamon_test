@@ -49,8 +49,6 @@ class Task(Base):
     task_id = Column(Integer, primary_key=True, index=True)
     task_name = Column(String, nullable=False)
     submodule_id = Column(Integer, ForeignKey("submodules.submodule_id"))
-
-    # Новое поле типа
     type = Column(Enum(ElementType, name="element_type"), default=ElementType.Task)
 
     description = Column(Text)

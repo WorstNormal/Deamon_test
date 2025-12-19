@@ -11,7 +11,6 @@ class StructureError(ParserError):
 
 class MissingFileError(ParserError):
     """Raised when a required file is missing."""
-
     def __init__(self, path: Path | str, message: str | None = None) -> None:
         if message is None:
             message = f"Missing required file: {path}"

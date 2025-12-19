@@ -56,7 +56,7 @@ async def upsert_task(session: AsyncSession, submodule_id: int, task_data) -> Ta
 
     update_data = {
         "description": task_data.description,
-        "type": task_data.type,  # Сохраняем тип (Task/Theory)
+        "type": task_data.type,
         "difficulty": task_data.difficulty,
         "time_limit": task_data.time_limit,
         "memory_limit": task_data.memory_limit,
