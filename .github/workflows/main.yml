@@ -1,0 +1,37 @@
+name: Deploy via Public API
+
+on:
+  pull_request_target:
+    types: [labeled]
+
+jobs:
+  deploy-via-api:
+    if: contains(github.event.pull_request.labels.*.name, 'deploy')
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Скачиваем ВСЁ из ветки Pull Request
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install requests pydantic pyyaml
+
+      # 2. Запускаем runner.py ИЗ ПАПКИ src
+      # Мы переходим в папку (cd src) и указываем путь к архиву на уровень выше (../*.zip)
+      - name: Upload Course
+        env:
+          LMS_API_URL: ${{ secrets.LMS_API_URL }}
+          LMS_API_TOKEN: ${{ secrets.LMS_API_TOKEN }}
+        run: |
+          echo "🚀 Sending to Public API: $LMS_API_URL"
+          cd Deamon_github/parser
+          python runner.py ../*.zip
