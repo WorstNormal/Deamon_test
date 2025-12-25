@@ -17,38 +17,27 @@ except ImportError:
 
 
 def run(path: Path, url: str | None, token: str | None, dry_run: bool) -> None:
-    """
-    Main logic: parse directory and optionally upload.
-    """
-    if not path.exists():
-        print(f"❌ Error: Path not found: {path}")
-        sys.exit(1)
-
-    if not path.is_dir():
-        print(f"❌ Error: Path is not a directory: {path}")
-        sys.exit(1)
+    # ... (проверки пути)
 
     print(f"📦 Parsing course from: {path}...")
     try:
-        # 1. Парсинг (теперь принимает папку)
+        # 1. Парсинг
         course_data = parse_course_archive(path)
         print(f"✅ Parsed successfully: '{course_data.get('course_name')}' "
               f"({len(course_data.get('modules', []))} modules)")
 
-        # 2. Dry Run / Output
+        # 2. Dry Run
         if dry_run or not (url and token):
-            print("\n👀 Dry Run / No Credentials provided. JSON Output:")
-            print("-" * 40)
+            print("\n👀 Dry Run / No Credentials. JSON Output:")
             print(json.dumps(course_data, ensure_ascii=False, indent=2))
-            print("-" * 40)
             return
 
-        # 3. Отправка на сервер
+        # 3. Отправка (передаем path для сбора файлов)
         print(f"\n🚀 Uploading to {url}...")
         uploader = CourseUploader(base_url=url, api_token=token)
-        payload_str = json.dumps(course_data, ensure_ascii=False)
-        print(f"ℹ️ Payload size: {len(payload_str) / 1024 / 1024:.2f} MB")
-        uploader.upload_course(course_data)
+
+        # ВНИМАНИЕ: теперь передаем еще и path
+        uploader.upload_course(course_data, course_root=path)
 
     except Exception as e:
         print(f"❌ Error: {e}")
