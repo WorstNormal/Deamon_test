@@ -38,4 +38,4 @@ jobs:
         run: |
           echo "🚀 Sending to Public API: $LMS_API_URL"
           # Запускаем runner как модуль и передаем ему путь к папке 'example'
-          python -m src.runner example
+          python -m src.runner Example
