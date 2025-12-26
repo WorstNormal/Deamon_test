@@ -10,9 +10,9 @@ class ElementType(str, Enum):
 
 
 class Difficulty(str, Enum):
-    Easy = "Easy"
-    Medium = "Medium"
-    Hard = "Hard"
+    Easy = "easy"
+    Medium = "medium"
+    Hard = "hard"
 
 
 class TaskModel(BaseModel):
@@ -42,6 +42,11 @@ class ModuleModel(BaseModel):
 class CourseModel(BaseModel):
     course_name: str
     description: Optional[str] = None
+    
+    # ДОБАВЛЕНО: поддержка списка разрешенных пользователей
+    # Соответствует allowed_users TEXT[] в SQL
+    allowed_users: Optional[List[str]] = Field(default=None)
+    
     modules: List[ModuleModel]
 
     @field_validator("modules")
