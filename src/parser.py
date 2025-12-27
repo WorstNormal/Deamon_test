@@ -59,7 +59,8 @@ def _parse_from_json(course_root: Path, json_data: Dict[str, Any]) -> dict:
                 description=description,
                 time_limit=item.get("time_limit"),
                 memory_limit=item.get("memory_limit"),
-                contentUrl=content_url
+                contentUrl=content_url,
+                testsUrl=item.get("testsUrl")
             )
             module_elements.append(element)
 
@@ -76,6 +77,7 @@ def _parse_from_json(course_root: Path, json_data: Dict[str, Any]) -> dict:
         course_name=json_data.get("title", "Imported Course"),
         description=json_data.get("description"),
         allowed_users=allowed_users,
+        address_name=json_data.get("address_name"),
         modules=parsed_modules
     )
 

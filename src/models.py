@@ -24,6 +24,8 @@ class ContentItemModel(BaseModel):
     time_limit: Optional[str] = None
     memory_limit: Optional[str] = None
     content_url: Optional[str] = Field(None, alias="contentUrl")
+    tests_url: Optional[str] = Field(None, alias="testsUrl")
+
 
 
 class ModuleModel(BaseModel):
@@ -47,4 +49,5 @@ class CourseModel(BaseModel):
     course_name: str = Field(..., alias="course_name")
     description: Optional[str] = None
     allowed_users: List[str] = Field(default_factory=list, alias="allowed_users")
+    address_name: Optional[str] = None
     modules: List[ModuleModel]
