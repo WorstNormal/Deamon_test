@@ -77,7 +77,9 @@ def _parse_from_json(course_root: Path, json_data: Dict[str, Any]) -> dict:
         course_name=json_data.get("title", "Imported Course"),
         description=json_data.get("description"),
         allowed_users=allowed_users,
+        compilers=json_data.get("compilers"),
         address_name=json_data.get("address_name"),
+
         modules=parsed_modules
     )
 

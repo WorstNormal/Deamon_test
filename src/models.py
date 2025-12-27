@@ -49,5 +49,7 @@ class CourseModel(BaseModel):
     course_name: str = Field(..., alias="course_name")
     description: Optional[str] = None
     allowed_users: List[str] = Field(default_factory=list, alias="allowed_users")
+    compilers: Optional[List[str]] = None
     address_name: Optional[str] = None
+
     modules: List[ModuleModel]
