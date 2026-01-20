@@ -1,1 +1,14 @@
+
 .idea/
+.vscode/
+
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+
+.env
+*.log
+
+.docker/
