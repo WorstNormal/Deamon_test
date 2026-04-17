@@ -235,7 +235,7 @@ submodule "Практика"   ← создаёт группу "Практика
 | `open_date` | string | нет | Дата открытия курса (ISO 8601). До этой даты курс не виден студентам |
 | `close_date` | string | нет | Дата закрытия курса (ISO 8601). После этой даты курс не виден студентам |
 | `address_name` | string | нет | Адрес олимпиады в NSUTS |
-| `compilers` | string[] | нет | Список доступных компиляторов |
+| `compilers` | string[] | нет | Список доступных компиляторов (см. [Доступные компиляторы](#доступные-компиляторы)) |
 | `seminars` | string[] | нет | Даты семинаров (формат `YYYY-MM-DD`) |
 | `allowed_users` | string[] | нет | Email-адреса допущенных студентов |
 | `allowed_groups` | string[] | нет | Номера учебных групп НГУ (берутся из JWT NSUID `/NSU/StudentGroups/<номер>`). Все студенты этих групп автоматически зачисляются на курс как `student`. |
@@ -293,6 +293,92 @@ submodule "Практика"   ← создаёт группу "Практика
 - `max_points` — абсолютное число баллов (не процент)
 - Если у задачи нет `penalties` — штрафов нет, тьютор видит полный `max_score`
 - Штрафы — **рекомендация** для тьютора, он может поставить любой балл от 0 до `max_score`
+
+## Доступные компиляторы
+
+В поле `compilers` нужно указывать **id** компилятора из таблицы ниже. Список актуален для `fresh.nsuts.ru`.
+
+### C / C++
+
+| ID | Название |
+|---|---|
+| `gcc9.3.0` | GCC 9.3.0 (Ubuntu 20 LTS) |
+| `gpp9.3.0` | G++ 9.3.0 (Ubuntu 20 LTS) |
+| `clanglinux` | Clang 10.0.0 (Ubuntu 20 LTS) |
+| `clangpplinux` | Clang++ 10.0.0 (Ubuntu 20 LTS) |
+| `mingw8.1c` | MinGW64 C 8.1 |
+| `mingw8.1cpp` | MinGW64 C++ 8.1 |
+| `mingw11.2c` | MinGW C 11.2 |
+| `mingw11.2cpp` | MinGW C++ 11.2 |
+| `mingwc5.1.0` | C (TDM-GCC 5.1.0) (testing) |
+| `mingw5.1.0` | C++ (TDM-GCC 5.1.0) |
+| `tdmgcc_c10.3.0` | TDM-GCC C 10.3.0 |
+| `tdmgcc_cpp10.3.0` | TDM-GCC C++ 10.3.0 |
+| `vc2019` | Visual C 2019 |
+| `vcc2019` | Visual C++ 2019 |
+| `vc2015` | Visual C 2015 |
+| `vcc2015` | Visual C++ 2015 |
+| `vcc2013` | Visual C++ 2013 |
+| `vcc2010` | Visual C++ 2010 |
+| `vcc2005` | Visual C++ 2005 |
+
+### Java
+
+| ID | Название |
+|---|---|
+| `java12.0.2` | Java 12.0.2 |
+| `java11.0.2` | OpenJDK 11.0.2 |
+| `java8.60` | Java 1.8.0_60 (64bit) |
+| `java8u101x64` | Java 8u121 (64bit) |
+| `java8u101x32` | Java 8u121 (32bit) |
+| `java7.25` | Java 1.7.0_25 (64bit) |
+
+### Python
+
+| ID | Название |
+|---|---|
+| `python3.7.6` | Python 3.7.6 |
+| `python3.6` | Python 3.6 |
+| `python3.5` | Python 3.5 |
+| `python2.7` | Python 2.7 |
+| `python3.6linux` | Python 3.4 (Linux) |
+
+### Pascal
+
+| ID | Название |
+|---|---|
+| `pabcnet3.7.1` | PascalABC.NET 3.7.1 |
+| `pabcnet3.2.4` | PascalABC.NET 3.4.2 |
+| `fpas3.0.0` | Free Pascal 3.0.0 |
+| `fpas2.6.4` | Free Pascal 2.6.4 |
+| `fpas2.6` | Free Pascal 2.6.0 |
+| `fpc` | Free Pascal 2.4.0 (Ubuntu 10.04 LTS) |
+
+### C# / Kotlin / Lua
+
+| ID | Название |
+|---|---|
+| `vc-sharp6` | Visual C# 2015 |
+| `vc-sharp5` | Visual C# 2013 |
+| `kotlinc` | Kotlin 1.4.10 |
+| `lua` | Lua 5.1.5 |
+| `luajit` | Lua JIT 2.0.2 |
+
+### Прочие
+
+| ID | Название |
+|---|---|
+| `nolang` | Текст (без компиляции) |
+| `customfile` | Custom File |
+| `dockertecharena` | Docker TechArena (Ubuntu 20 LTS) |
+| `dvdrental_sql` | PostgresSQL (DvdRental Database) |
+| `wares_sql` | SQLite (Wares Database) |
+
+> **Рек��мендуемые для курсов C:** `mingw8.1c`, `gcc9.3.0`, `clanglinux`
+>
+> **Рекомендуемые для курсов C++:** `mingw8.1cpp`, `gpp9.3.0`, `clangpplinux`
+>
+> **Получить актуальный список:** `GET /api/jury/tour_settings/compilers/info` (требует авторизацию и контекст тура в NSUTS)
 
 ## Запуск
 
