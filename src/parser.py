@@ -194,7 +194,6 @@ def _flush_content_group(
             except Exception:
                 description = None
         title = meta.get("title", meta.get("submodule_name", "Untitled"))
-
     content_items.append(ContentItemModel(
         type="submodule",
         title=title,
