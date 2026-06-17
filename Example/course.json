@@ -1,0 +1,58 @@
+{
+  "title": "Imperative Programming",
+  "description": "Introduction to C programming, memory management, and algorithms.",
+  "address_name": "olymp_demons_test_v111",
+  "modules": [
+    {
+      "title": "123",
+      "content": [
+        {
+          "type": "submodule",
+          "title": "111",
+          "contentUrl": "content/Lecture-1/111.md"
+        },
+        {
+          "type": "submodule",
+          "title": "222",
+          "contentUrl": "content/Lecture-1/222.md"
+        },
+        {
+          "type": "task",
+          "title": "333",
+          "contentUrl": "content/Lecture-1/333.md",
+          "difficulty": "easy"
+        },
+        {
+          "type": "task",
+          "title": "444",
+          "contentUrl": "content/Lecture-1/444.md",
+          "difficulty": "medium"
+        },
+        {
+          "type": "task",
+          "title": "555",
+          "contentUrl": "content/Lecture-1/555.md",
+          "difficulty": "hard"
+        }
+      ]
+    },
+    {
+      "title": "234",
+      "content": [
+        {
+          "type": "submodule",
+          "title": "666",
+          "contentUrl": "content/lecture-2/666.md"
+        },
+        {
+          "type": "submodule",
+          "title": "777",
+          "contentUrl": "content/lecture-2/777.md"
+        }
+      ]
+    }
+  ],
+  "allowed_users": [
+    "stud@nsuts.ru"
+  ]
+}
